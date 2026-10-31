@@ -1,0 +1,70 @@
+{
+  "version": "preview-1",
+  "reviewed_on": "2026-10-30",
+  "cards": [
+    {
+      "id": "K01", "title": "周环比的比较口径", "kind": "项目分析规则",
+      "principle": "周环比使用同一门店相隔7天的两条记录，上周销售额须大于零。",
+      "application": "先核对比较日期和基数，再解释销售变化。",
+      "records": ["本周与上周销售周记录", "销售额金额单位"],
+      "boundary": "降幅用于描述变化，不能单独确认经营异常或下降原因。",
+      "source_title": "观澜项目：周环比计算与输入校验", "source_org": "项目自行设计", "source_url": "", "source_section": "diagnosis.py / percent_change、diagnose_sales_decline"
+    },
+    {
+      "id": "K02", "title": "历史参照与高基数核查", "kind": "项目分析规则",
+      "principle": "将目标周与此前窗口比较，并同时检查上周是否偏高、本周是否仍低于更早历史水平。",
+      "application": "上周偏高时核查一次性活动或集中采购；本周也偏低时继续查本周经营情况。默认8周由项目选定。",
+      "records": ["目标周以前的周销售记录", "上周活动或集中采购记录"],
+      "boundary": "基线不含目标周和未来数据；高基数形态不等于已经确认活动结束，也不能解释全部下降。",
+      "source_title": "观澜项目：历史窗口和中位数对照", "source_org": "项目自行设计", "source_url": "", "source_section": "diagnosis.py / historical、earlier_median、high_base_pattern"
+    },
+    {
+      "id": "K03", "title": "同期其他门店参照", "kind": "项目分析规则",
+      "principle": "排除目标门店，计算有完整相邻周记录的其他门店环比、中位数和下降门店数量。",
+      "application": "结合共同变化与本店差异安排核查顺序。",
+      "records": ["其他门店同期的两周销售记录", "门店规模和地区等可比性资料（如有）"],
+      "boundary": "其他门店未作相似门店匹配，属于描述性参照，不能据此识别因果。",
+      "source_title": "观澜项目：同期参照门店筛选", "source_org": "项目自行设计", "source_url": "", "source_section": "diagnosis.py / peers、peer_changes"
+    },
+    {
+      "id": "K04", "title": "缺周和缺失记录处理", "kind": "项目分析规则",
+      "principle": "没有销售记录不代表销售额为零；环比计算要求日期恰好相隔7天。",
+      "application": "检查缺失周和排除的参照门店，补齐记录后重新计算。",
+      "records": ["缺失销售周的原始周报", "数据导出范围和门店清单"],
+      "boundary": "不自动补零，不跨缺失周计算周环比；样本不足时披露覆盖范围。",
+      "source_title": "观澜项目：CSV校验与缺周处理", "source_org": "项目自行设计", "source_url": "", "source_section": "data_import.py、diagnosis.py / 缺周检查"
+    },
+    {
+      "id": "K05", "title": "节假日与比较条件核查", "kind": "公开资料＋项目核查规则",
+      "principle": "美国人口普查局零售时间序列说明区分季节、节假日和交易日差异。",
+      "application": "本项目据此设计日历核查：比较目标周和上周的标记，并进一步核对当地节庆、活动日历。",
+      "records": ["门店所在地的实际节庆和活动日历", "两周Holiday_Flag标记"],
+      "boundary": "该资料介绍月度统计口径；本项目未实施季节调整。周标记相同也不代表所有经营情境相同。",
+      "source_title": "Monthly Retail Trade — Time Series Data", "source_org": "U.S. Census Bureau", "source_url": "https://www.census.gov/retail/marts/www/timeseries.html", "source_section": "Notes：季节、节假日和交易日调整说明"
+    },
+    {
+      "id": "K06", "title": "促销前后变化核查", "kind": "公开资料＋项目核查规则",
+      "principle": "昆士兰州政府商业指南说明，促销通常限时开展，旨在短期刺激购买。",
+      "application": "本项目据此设计核查：确认上周是否有活动、本周是否结束，再核对活动覆盖商品和销售变化的时间关系。",
+      "records": ["活动开始与结束日期", "参与商品和折扣记录", "活动商品同期销售记录（如有）"],
+      "boundary": "一般促销知识不证明本店开展过活动；用户填报仍需记录核验，不能计算促销对降幅的贡献。",
+      "source_title": "Sales promotions and discounts", "source_org": "Business Queensland", "source_url": "https://www.business.qld.gov.au/running-business/marketing-sales/marketing/activities/sales-promotions", "source_section": "Role of sales promotions"
+    },
+    {
+      "id": "K07", "title": "库存与缺货核查", "kind": "公开资料＋项目核查规则",
+      "principle": "澳大利亚政府商业指南建议跟踪库存，并将盘点结果与销售记录对照以发现问题。",
+      "application": "本项目据此设计核查：检查缺货商品、持续时段及库存记录，确认是否与目标销售周重合。",
+      "records": ["缺货商品清单及发生时段", "库存流水与盘点记录", "对应商品销售记录（如有）"],
+      "boundary": "当前周销售CSV没有库存字段，不能判断缺货是否实际发生，也不能估算缺货损失。",
+      "source_title": "Manage your inventory", "source_org": "business.gov.au", "source_url": "https://business.gov.au/products-and-services/inventory-management/manage-your-inventory", "source_section": "Set up an inventory tracking system；Review stocktake results"
+    },
+    {
+      "id": "K08", "title": "营业时段与停业记录核查", "kind": "项目核查规则",
+      "principle": "比较两周销售时，将实际营业时长和停业情况列为需要补充的经营条件。",
+      "application": "核对目标周是否存在停业、施工或营业时段缩短，并与上周对照。",
+      "records": ["两周实际营业时长", "停业、施工或临时调整记录"],
+      "boundary": "这是项目设计的核查清单，尚未经商家验证；当前数据不能自动确认营业受限或量化其影响。",
+      "source_title": "观澜项目：营业情况补充与核查清单", "source_org": "项目自行设计", "source_url": "", "source_section": "diagnosis.py / BUSINESS_FIELDS.reduced_hours"
+    }
+  ]
+}
